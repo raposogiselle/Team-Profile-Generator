@@ -1,9 +1,3 @@
-// import modules -> Employee subclasses, fs, inquirer, path, page-template, questions
-
-// use path module to define the path to the output directory
-// 
-
-
 const Manager = require("./lib/Manager.js");
 const Engineer = require("./lib/Engineer.js");
 const Intern = require("./lib/Intern.js");
@@ -191,4 +185,3 @@ const managerQuestions = () => {
             }
         })
 }
-
