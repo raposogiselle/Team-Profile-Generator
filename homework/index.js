@@ -1,37 +1,194 @@
 // import modules -> Employee subclasses, fs, inquirer, path, page-template, questions
 
 // use path module to define the path to the output directory
-const OUTPUT_DIR = path.resolve(__dirname, "output")
-const outputPath = path.join(OUTPUT_DIR, "team.html");
+// 
 
-// create an array to hold all of our team members
 
-// init function
+const Manager = require("./lib/Manager.js");
+const Engineer = require("./lib/Engineer.js");
+const Intern = require("./lib/Intern.js");
+const inquirer = require("inquirer");
+const path = require("path");
+const fs = require("fs");
 
-	// function to create a manager
-		// prompt user with questions needed to satisfy the input for a manager object
-		// .then statement
-			// create a new instance of the Manager class
-			// push the new manager object to the team members array
-			// call the function to create the rest of the team
-  
-	// function to create the rest of the team
-		// prompt user to select which type of employee they would like to add
-		// options include engineer, intern, or an option to not add any more team members
-		// .then statement
-			// if a type of employee was selected, call function to add that type of employee
-			// if the other option was selected, call the function to create the output
+const DIST_DIR = path.resolve(__dirname, "dist");
+const distPath = path.join(DIST_DIR, "team.html");
 
-	// function to add an engineer
-		// same idea as create manager
-  
-	// function to add an intern
-		// same idea as create manager
+const render = require("./lib/htmlRenderer");
 
-	// function to create the output
-		// call the function from page-template module and pass in the team members array and save to a data variable
-		// use fs module to write the a file -> pass in the fs.write(outputPath, the data, and "utf-8")
+let employeeArr = [];
 
-  // call the function to create a manager to start the process
+const initialQuestion = () => {
+    inquirer.prompt([
+        {
+            type: 'list',
+            message: 'What type of employee?',
+            name: 'employeeType',
+            choices: [Manager, Engineer, Intern]
+        },
+    ])
+        .then(answer => {
 
-// call init()
+            if (answer.employeeType === 'Manager') {
+                managerQuestions();
+            } else if
+                (answer.employeeType === 'Engineer') {
+                engineerQuestions();
+            } else if
+                (answer.employeeType === 'Intern') {
+                internQuestions();
+            }
+            else {
+                console.log('Done.');
+                return;
+            }
+        })
+}
+
+initialQuestion();
+
+const internQuestions = () => {
+    inquirer.prompt([
+
+        {
+            type: 'input',
+            message: 'What is the intern\'s name?',
+            name: 'internName'
+        },
+        {
+            type: 'input',
+            message: 'What is the intern\'s employee ID?',
+            name: 'id',
+        },
+        {
+            type: 'input',
+            message: 'What is the intern\'s email?',
+            name: 'email',
+        },
+        {
+            type: 'input',
+            message: 'What is the intern\'s school?',
+            name: 'school',
+        },
+        {
+            type: 'confirm',
+            message: 'Would you like to enter another employee?',
+            name: 'addCheck',
+        },
+
+    ])
+        .then(answers => {
+            const intern = new Intern(answers.internName, answers.id, answers.email, answers.school);
+            employeeArr.push(intern);
+
+            console.log(employeeArr);
+
+            if (answers.addCheck) {
+                initialQuestion();
+            } else {
+                let data = render(employeeArr);
+                fs.writeFile(distPath, data, (err) => {
+                    if (err) throw err;
+                    console.log('The file has been saved.');
+                });
+            }
+        })
+}
+
+const engineerQuestions = () => {
+    inquirer.prompt([
+
+        {
+            type: 'input',
+            message: 'What is the engineer\'s name?',
+            name: 'engineerName'
+        },
+        {
+            type: 'input',
+            message: 'What is engineer\'s employee ID?',
+            name: 'id',
+        },
+        {
+            type: 'input',
+            message: 'What is the engineer\'s email?',
+            name: 'email',
+        },
+        {
+            type: 'input',
+            message: 'What is the engineer\'s GitHub username?',
+            name: 'github',
+        },
+        {
+            type: 'confirm',
+            message: 'Would you like to enter another employee?',
+            name: 'addCheck',
+        },
+
+    ])
+        .then(answers => {
+            const engineer = new Engineer(answers.engineerName, answers.id, answers.email, answers.github);
+            employeeArr.push(engineer);
+
+            console.log(employeeArr);
+
+            if (answers.addCheck) {
+                initialQuestion();
+            } else {
+                let data = render(employeeArr);
+                fs.writeFile(distPath, data, (err) => {
+                    if (err) throw err;
+                    console.log('The file has been saved.');
+                });
+            }
+        })
+}
+
+const managerQuestions = () => {
+    inquirer.prompt([
+
+        {
+            type: 'input',
+            message: 'What is the manager\'s name?',
+            name: 'managerName'
+        },
+        {
+            type: 'input',
+            message: 'What is the manager\'s ID?',
+            name: 'id',
+        },
+        {
+            type: 'input',
+            message: 'What is the manager\'s email?',
+            name: 'email',
+        },
+        {
+            type: 'input',
+            message: 'What is the manager\'s office number?',
+            name: 'officeNumber',
+        },
+        {
+            type: 'confirm',
+            message: 'Would you like to enter another employee?',
+            name: 'addCheck',
+        },
+
+    ])
+        .then(answers => {
+
+            const manager = new Manager(answers.managerName, answers.id, answers.email, answers.officeNumber);
+            employeeArr.push(manager);
+
+            console.log(employeeArr);
+
+            if (answers.addCheck) {
+                initialQuestion();
+            } else {
+                let data = render(employeeArr);
+                fs.writeFile(distPath, data, (err) => {
+                    if (err) throw err;
+                    console.log('The file has been saved.');
+                });
+            }
+        })
+}
+
